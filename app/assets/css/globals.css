@@ -1,0 +1,192 @@
+@import "tailwindcss";
+
+@import "../../../layers/base/app/assets/css/theme.css";
+@import "../../../layers/base/app/assets/css/grid.css";
+@import "../../../layers/base/app/assets/css/misc.css";
+
+@font-face {
+	font-family: 'display';
+	src: url('../fonts/HostGrotesk-500.woff2') format('woff2');
+	font-weight: 500;
+	font-style: normal;
+	font-display: swap;
+}
+
+@font-face {
+	font-family: 'display';
+	src: url('../fonts/HostGrotesk-400.woff2') format('woff2');
+	font-weight: 400;
+	font-style: normal;
+	font-display: swap;
+}
+
+@font-face {
+	font-family: 'Geist Mono';
+	src: url('../fonts/GeistMono-400.woff2') format('woff2');
+	font-weight: 400;
+	font-style: normal;
+	font-display: swap;
+}
+
+@theme {
+	--color-*: initial;
+	--color-ground: #d9d9d9;
+	--color-ink: #111;
+	--color-sheet: #f6f4ef;
+
+	--font-display: 'display', ui-sans-serif, system-ui, sans-serif;
+
+	--font-mono: 'Geist Mono', ui-monospace, monospace;
+}
+
+:root {
+	--size: 390;
+	--gutter: 1.5rem;
+	--margin: 2rem;
+	--site-cols: 4;
+}
+
+@media (width >= 650px) {
+	:root {
+		--size: 1440;
+		--gutter: 2rem;
+		--margin: 4rem;
+		--site-cols: 12;
+	}
+}
+
+html,
+body {
+	position: fixed;
+	inset: 0;
+	overflow: hidden;
+	touch-action: none;
+}
+
+html {
+	font-size: max(5px, calc(10 * (100vw / var(--size))));
+
+	scrollbar-gutter: auto;
+	background: var(--color-ground);
+	color: var(--color-ink);
+	font-family: var(--font-mono);
+	text-rendering: geometricPrecision;
+	user-select: none;
+}
+
+html[data-grabbable] {
+	cursor: grab;
+}
+
+html[data-grabbing],
+html[data-grabbing] * {
+	cursor: grabbing !important;
+}
+
+@utility t-label {
+	font-family: var(--font-mono);
+	font-size: 1rem;
+	line-height: 1.2;
+	letter-spacing: .04em;
+	text-transform: uppercase;
+}
+
+@utility t-display {
+	font-family: var(--font-display);
+	font-weight: 500;
+	font-size: 10rem;
+	line-height: .9;
+	letter-spacing: -.04em;
+	font-variant-ligatures: none;
+
+	@variant s {
+		font-size: 22rem;
+	}
+}
+
+@utility t-cover {
+	font-family: var(--font-display);
+	font-weight: 500;
+	font-size: 3.2rem;
+	line-height: 1;
+	letter-spacing: -.04em;
+	font-variant-ligatures: none;
+
+	@variant s {
+		font-size: 4rem;
+	}
+}
+
+@utility t-sheet-title {
+	font-family: var(--font-display);
+	font-weight: 500;
+	font-size: 21cqw;
+	line-height: .95;
+	letter-spacing: -.04em;
+	font-variant-ligatures: none;
+}
+
+@utility t-sheet-heading {
+	font-family: var(--font-display);
+	font-weight: 500;
+	font-size: 15cqw;
+	line-height: .95;
+	letter-spacing: -.04em;
+	font-variant-ligatures: none;
+}
+
+@utility t-sheet-lede {
+	font-family: var(--font-display);
+	font-weight: 500;
+	font-size: 4.45cqw;
+	line-height: 1.25;
+	letter-spacing: -.02em;
+	font-variant-ligatures: none;
+
+	text-wrap: pretty;
+
+	@variant max-s {
+		font-size: 1.8rem;
+	}
+}
+
+@utility t-sheet-label {
+	font-family: var(--font-mono);
+	font-size: 2.1cqw;
+	line-height: 1.3;
+	letter-spacing: .04em;
+	text-transform: uppercase;
+	font-variant-ligatures: none;
+
+	@variant max-s {
+		font-size: 1rem;
+	}
+}
+
+@utility t-sheet-note {
+	font-family: var(--font-mono);
+	font-size: 1.6cqw;
+	line-height: 1.3;
+	letter-spacing: .04em;
+	text-transform: uppercase;
+	font-variant-ligatures: none;
+
+	@variant max-s {
+		font-size: 1rem;
+	}
+}
+
+@utility t-sheet-body {
+	font-family: var(--font-display);
+	font-weight: 500;
+	font-size: 2.85cqw;
+	line-height: 1.4;
+	letter-spacing: -.01em;
+	font-variant-ligatures: none;
+
+	text-wrap: pretty;
+
+	@variant max-s {
+		font-size: 1.4rem;
+	}
+}

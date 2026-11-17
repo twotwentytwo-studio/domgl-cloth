@@ -1,0 +1,76 @@
+/* ---------------------------------------------------------------------------
+   The grid.
+
+   Three variables and four utilities. The variables are the design's — the
+   site redeclares them per breakpoint in its globals.css, from the Grid line
+   of design-system.md. These defaults are the common 390 / 1440 pair:
+
+              columns   gutter   outer margin
+   390           4        15         20
+   1440         12        20         40
+
+   Gutter and margin are rem, so they ride the fluid root. Columns are
+   fractions of the container, so they keep growing after rem clamps. Place on
+   tracks, nudge with margins; never offset with a rem that only equals a
+   gridline at the design width.
+--------------------------------------------------------------------------- */
+
+:root {
+	--gutter: 1.5rem;
+	--margin: 2rem;
+	--site-cols: 4;
+}
+
+@media (width >= 650px) {
+	:root { --gutter: 2rem; --margin: 4rem; --site-cols: 12; }
+}
+
+/* The margin steps in past the safe area where that is wider — a phone on its
+   side puts the notch and the rounded corners inside the design's margin, and
+   viewport-fit=cover lets the page paint under them. */
+@utility site-max {
+	width: 100%;
+	margin-inline: auto;
+	padding-left: max(var(--margin), env(safe-area-inset-left, 0px));
+	padding-right: max(var(--margin), env(safe-area-inset-right, 0px));
+
+	& .site-max { padding-inline: 0; }
+}
+
+@utility site-grid {
+	display: grid;
+	grid-template-columns: repeat(var(--site-cols), minmax(0, 1fr));
+	column-gap: var(--gutter);
+	align-content: start;
+}
+
+/* A nested grid carrying the page's own gutter, so it composes to any depth:
+   site-grid-10 inside a five-column block gives half-column tracks whose even
+   lines are the page's; site-grid-5 gives whole ones.
+
+   align-content: start is load-bearing — a nested grid is usually a stretched
+   item of the grid outside it, and auto rows under the default `normal` share
+   the spare height out between them, which quietly breaks any rhythm that
+   depends on a blank row. */
+@utility site-grid-* {
+	display: grid;
+	grid-template-columns: repeat(--value(integer), minmax(0, 1fr));
+	column-gap: var(--gutter);
+	align-content: start;
+}
+
+/* A first-line indent in exact grid columns. --cols is how many columns the
+   element spans (so one column derives from its own width), --indent how many
+   columns the first line steps in — an indent crosses its gutters too, so k
+   columns is k tracks plus k gaps.
+
+   `col-indent s:[--cols:8] s:[--indent:3]` — --cols falls back to the whole
+   site grid, --indent to 0. */
+@utility col-indent {
+	text-indent: calc(
+		(100% - (var(--cols, var(--site-cols)) - 1) * var(--gutter))
+		/ var(--cols, var(--site-cols))
+		* var(--indent, 0)
+		+ var(--indent, 0) * var(--gutter)
+	);
+}

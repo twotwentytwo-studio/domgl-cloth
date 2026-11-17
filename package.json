@@ -1,0 +1,41 @@
+{
+	"name": "domgl-cloth",
+	"private": true,
+	"type": "module",
+	"scripts": {
+		"dev": "nuxt dev",
+		"build": "nuxt build",
+		"preview": "nuxt preview",
+		"postinstall": "nuxt prepare",
+		"typecheck": "nuxt typecheck",
+		"generate": "NUXT_PUBLIC_SITE_URL=https://domgl-cloth.jesperlandberg.com nuxt generate"
+	},
+	"dependencies": {
+		"@alpacka/scroll": "^0.3.0",
+		"@lama/domgl": "file:vendor/domgl",
+		"@lama/motion": "https://github.com/jesperlandberg/lama/releases/download/motion-v0.1.0/lama-motion-0.1.0.tgz",
+		"@lama/split": "https://github.com/jesperlandberg/lama/releases/download/split-v0.2.0/lama-split-0.2.0.tgz",
+		"@nuxtjs/robots": "^6.2.3",
+		"@nuxtjs/sitemap": "^8.5.1",
+		"@tailwindcss/vite": "^4.3.3",
+		"detect-ua": "^1.0.2",
+		"gsap": "^3.15.0",
+		"lenis": "^1.3.27",
+		"mitt": "^3.0.1",
+		"nuxt": "^4.5.2",
+		"tailwindcss": "^4.3.3",
+		"vue": "^3.5.43"
+	},
+	"devDependencies": {
+		"@types/node": "^22.20.4",
+		"@types/stats.js": "^0.17.4",
+		"@webgpu/types": "^0.1.74",
+		"sharp": "^0.35.4",
+		"stats.js": "^0.17.0",
+		"typescript": "^5.9.3",
+		"vue-tsc": "^3.3.11"
+	},
+	"engines": {
+		"node": ">=22"
+	}
+}

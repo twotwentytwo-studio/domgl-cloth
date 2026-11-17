@@ -1,0 +1,5 @@
+<template>
+	<slot />
+
+	<GridOverlay />
+</template>

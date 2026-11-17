@@ -1,0 +1,11 @@
+node_modules
+.nuxt
+.output
+.netlify
+.data
+dist
+.env
+.DS_Store
+*.log
+.wrangler
+/writeup

@@ -1,0 +1,228 @@
+/* ---------------------------------------------------------------------------
+   The scale — "Figma px ÷ 10 = rem".
+
+   A 24px value in the comp is `text-24` / `p-24` / `rounded-24` → 2.4rem, and
+   the fluid root below makes that resolve to exactly 24px at the width the
+   comp was drawn at.
+
+   `--spacing` is one dynamic value, so `p-24` compiles to
+   calc(var(--spacing) * 24) and covers padding, margin, gap, width, height and
+   inset in one declaration. font-size and border-radius have no bare-number
+   path in Tailwind 4, so they come back as @utility rules. line-height does
+   have one, but it resolves against --spacing (leading-14 would be 1.4rem,
+   not 1.4) — so those are explicit, unitless theme entries.
+
+   The site imports this from its globals.css and then states its own palette,
+   faces, design widths, leading and grid — design-system.md is the source.
+--------------------------------------------------------------------------- */
+
+@theme {
+	--spacing: .1rem;
+
+	--breakpoint-s: 650px;
+	--breakpoint-sm: 1100px;
+	--breakpoint-m: 1300px;
+	--breakpoint-l: 1400px;
+
+	/* Unitless. Two digits is ÷10, three is ÷100. These are the common ones;
+	   the site adds what its comp uses and leaves the rest in place — an
+	   unused entry emits nothing. Taking one out (`--leading-14: initial`)
+	   sends leading-14 back to calc(var(--spacing) * 14), 1.4rem: the trap
+	   these entries exist to avoid. */
+	--leading-9: .9;
+	--leading-10: 1;
+	--leading-11: 1.1;
+	--leading-12: 1.2;
+	--leading-13: 1.3;
+	--leading-14: 1.4;
+	--leading-15: 1.5;
+
+	--ease-out-quad: cubic-bezier(0.25, 0.46, 0.45, 0.94);   /* gsap power1.out — fades */
+	--ease-out-cubic: cubic-bezier(0.215, 0.61, 0.355, 1);   /* power2.out — small text */
+	--ease-out-quart: cubic-bezier(0.165, 0.84, 0.44, 1);
+	--ease-out-expo: cubic-bezier(0.19, 1, 0.22, 1);         /* expo.out — big text */
+	--ease-in-out-quart: cubic-bezier(0.77, 0, 0.175, 1);
+
+	/* CSS twins of the `snappy` and `reveal` CustomEases in plugins/gsap,
+	   sampled at 25 points so CSS and gsap move on the same curve. linear()
+	   rather than cubic-bezier(): each original is a multi-segment path, and
+	   no single cubic passes through both of its knees. Re-sample if a path
+	   in the gsap plugin ever changes — the two drift silently otherwise. */
+	--ease-snappy: linear(0, 0.0191, 0.062, 0.1566, 0.3378, 0.5335, 0.6892, 0.8, 0.8686, 0.912, 0.9469, 0.964, 0.9741, 0.981, 0.9859, 0.9896, 0.9923, 0.9946, 0.9961, 0.9976, 0.9984, 0.9991, 0.9996, 0.9998, 1);
+	--ease-reveal: linear(0, 0.0031, 0.0148, 0.0428, 0.109, 0.2893, 0.5995, 0.7782, 0.8706, 0.9091, 0.9306, 0.947, 0.9592, 0.9688, 0.9761, 0.982, 0.9867, 0.9903, 0.9932, 0.9955, 0.9972, 0.9984, 0.9994, 0.9997, 1);
+
+	/* A bare `transition` / `transition-opacity` is a fade unless told
+	   otherwise: .35s on power1.out's twin. The same default gsap tweens get
+	   (plugins/gsap) and the one utils/motion names. */
+	--default-transition-duration: .35s;
+	--default-transition-timing-function: var(--ease-out-quad);
+}
+
+/* --value(integer) matches only bare integers, so text-center, text-balance,
+   text-ink and text-[3.7rem] all still fall through to the built-ins */
+@utility text-* {
+	font-size: calc(var(--spacing) * --value(integer));
+
+	/* iOS zooms the page into a focused field set under 16px, and the fluid
+	   root takes text-16 under it on any phone narrower than the design
+	   width. On touch a field never goes below — a platform threshold, so px,
+	   not rem. Fields that inherit their size get the same floor in Touch,
+	   below. */
+	@variant touch {
+		&:is(input, textarea, select) {
+			font-size: max(16px, calc(var(--spacing) * --value(integer)));
+		}
+	}
+}
+
+@utility rounded-* {
+	border-radius: calc(var(--spacing) * --value(integer));
+}
+
+@custom-variant max-l (@media (width < 1400px));
+@custom-variant max-m (@media (width < 1300px));
+@custom-variant max-sm (@media (width < 1100px));
+@custom-variant max-s (@media (width < 650px));
+
+/* A fine pointer on a device that hovers — the same test as POINTER in
+   utils/common and $resize.mouse, and the one the scroll plugin forks on.
+   `touch` is its exact complement: the markup is the same on every device
+   and CSS does the forking (`touch:hidden`), never a v-if on a client-only
+   fact. `has-not-hover` is the older name for it. */
+@custom-variant has-hover (@media (hover: hover) and (pointer: fine));
+@custom-variant touch (@media not all and (hover: hover) and (pointer: fine));
+@custom-variant has-not-hover (@media not all and (hover: hover) and (pointer: fine));
+
+/* `hover:` itself on the same test. Tailwind's own asks (hover: hover) alone,
+   which some touch devices answer yes to, and a hover a tap sets stays stuck
+   until the next tap lands somewhere else. group-hover, peer-hover and
+   focus:hover compound from this one, so they follow. A :hover in plain CSS
+   goes inside `@variant hover { … }` for the same reason. */
+@custom-variant hover {
+	@media (hover: hover) and (pointer: fine) {
+		&:hover {
+			@slot;
+		}
+	}
+}
+
+@custom-variant portrait (@media (orientation: portrait));
+@custom-variant landscape (@media (orientation: landscape));
+@custom-variant tight (@media (min-aspect-ratio: 2.125/1));
+
+/* ---------------------------------------------------------------------------
+   Base
+--------------------------------------------------------------------------- */
+
+:root {
+	/* The width the comp is drawn at, per breakpoint. The site overrides both
+	   in its globals.css from design-system.md — guessing them makes every
+	   value in the build subtly wrong. */
+	--size: 390;
+}
+
+@media (width >= 650px) {
+	:root { --size: 1500; }
+}
+
+html {
+	/* 1rem = 10px at exactly --size, so the ÷10 scale lands pixel-exact on the
+	   comp and stays proportional either side of it. The 12px ceiling stops it
+	   growing without bound on very wide screens; the 5px floor is a guard.
+
+	   Past the ceiling, rem stops growing while grid columns — fractions of the
+	   container — carry on. That is why anything on the layout grid is placed
+	   with col-start/col-end and never with a rem offset that happens to match
+	   a gridline at the design width. */
+	font-size: clamp(5px, 12px, calc(10 * (100vw / var(--size))));
+
+	/* Reserve the scrollbar's width whether or not one is showing: a page
+	   transition that pins the leaving page out of flow collapses the document
+	   for a few frames, and without this the viewport widens by the bar and
+	   the whole page jumps sideways. A site whose document never scrolls (the
+	   virtual scroll) sets it back to auto, or the reserve is an empty strip
+	   down the right edge. */
+	scrollbar-gutter: stable;
+	-webkit-text-size-adjust: none;
+	-webkit-font-smoothing: antialiased;
+	-webkit-tap-highlight-color: transparent;
+}
+
+a[x-apple-data-detectors] {
+	color: inherit !important;
+	text-decoration: none !important;
+}
+
+html,
+body {
+	width: 100%;
+	/* No pull-to-refresh and no rubber band, on any device: a refresh fired
+	   by an overshoot throws the page's state away, and the bounce drags the
+	   document off anything fixed over it — the GL canvas first. */
+	overscroll-behavior: none;
+}
+
+/* ---------------------------------------------------------------------------
+   Touch — what a phone needs and a desktop never notices. The tap highlight
+   is off on html above; viewport-fit=cover and theme-color are in app.vue,
+   the safe-area utilities in misc.css. In @layer base, so a utility on the
+   element still wins.
+--------------------------------------------------------------------------- */
+
+@layer base {
+	/* Controls answer the tap at once — no wait to see whether it was a
+	   double-tap zoom — while pinch-zoom on the page stays. */
+	a,
+	button,
+	input,
+	label,
+	select,
+	summary,
+	textarea,
+	[role='button'] {
+		touch-action: manipulation;
+	}
+
+	/* A long press on a button selects its label rather than pressing it. */
+	button,
+	[role='button'] {
+		-webkit-user-select: none;
+		user-select: none;
+	}
+
+	/* The 16px floor text-* gives a field, for one that inherits its size. */
+	input,
+	select,
+	textarea {
+		@variant touch {
+			font-size: max(16px, 1em);
+		}
+	}
+}
+
+/* ---------------------------------------------------------------------------
+   Lenis — present on a fine pointer only (see plugins/scroll.client.ts)
+--------------------------------------------------------------------------- */
+
+html.lenis,
+html.lenis body { height: auto; }
+
+.lenis:not(.lenis-autoToggle).lenis-stopped { overflow: clip; }
+
+.lenis [data-lenis-prevent],
+.lenis [data-lenis-prevent-wheel],
+.lenis [data-lenis-prevent-touch],
+.lenis [data-lenis-prevent-vertical],
+.lenis [data-lenis-prevent-horizontal] { overscroll-behavior: contain; }
+
+.lenis.lenis-smooth iframe { pointer-events: none; }
+
+.lenis.lenis-autoToggle {
+	transition-property: overflow;
+	transition-duration: 1ms;
+	transition-behavior: allow-discrete;
+}
+
+/* $scroll.stop() on touch, where there is no Lenis to stop */
+html.scroll-locked,
+html.scroll-locked body { overflow: hidden; }

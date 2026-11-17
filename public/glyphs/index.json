@@ -1,0 +1,22 @@
+{
+	"faces": [
+		{
+			"id": "display-500",
+			"family": "display",
+			"weight": 500,
+			"style": "normal"
+		},
+		{
+			"id": "display-400",
+			"family": "display",
+			"weight": 400,
+			"style": "normal"
+		},
+		{
+			"id": "geist-mono-400",
+			"family": "Geist Mono",
+			"weight": 400,
+			"style": "normal"
+		}
+	]
+}
